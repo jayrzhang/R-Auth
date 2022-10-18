@@ -35,6 +35,7 @@ Principal --|> ResponseEntity
 ### Overview
 R-Auth provides below importatnt features:
 1. Authorization service
+### Authorize flow
 ``` mermaid
     sequenceDiagram
     autonumber
@@ -51,17 +52,20 @@ R-Auth provides below importatnt features:
             AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: update granted authorities if any
         else User not exist
             AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: insert new user information into database
+            end
         AuthUserDetailsServiceImpl->>WebSecurityConfiguration: Build AuthenticationManagerBuilder
         WebSecurityConfiguration->>WebSecurityConfiguration: Validate given username and password
         alt Validate success
             WebSecurityConfiguration->>AuthorizationController: Provide granted authorities
         else Validate failed
             WebSecurityConfiguration->>AuthorizationController: Exception thrown InvalidGrantException
-    alt Superuser
+            end
+    else Superuser
         APIFilter->>R-Integration Vault Endpoint: Validate given username and password
         alt Validate success
             WebSecurityConfiguration->>AuthorizationController: Provide granted authorities
         else Validate failed
             WebSecurityConfiguration->>AuthorizationController: Exception thrown InvalidGrantException
+            end
     end
 ```
