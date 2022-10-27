@@ -46,16 +46,16 @@ R-Auth provides below importatnt features:
     participant WebSecurityConfiguration
     AuthorizationController->>APIFilter: Invoke http interceptor to check if user is superuser or normal user
     alt Normaluser
-        APIFilter->>LdapUserAuthoritiesPopulator: Fetch granted authorities
-        LdapUserAuthoritiesPopulator->>AuthUserDetailsServiceImpl: Load user by username
-        alt User exist
-            AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: update granted authorities if any
-        else User not exist
-            AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: insert new user information into database
-            end
-        AuthUserDetailsServiceImpl->>WebSecurityConfiguration: Build AuthenticationManagerBuilder
-        WebSecurityConfiguration->>WebSecurityConfiguration: Validate given username and password
+        APIFilter->>WebSecurityConfiguration: Access Ldap server and validate given username and password
         alt Validate success
+            WebSecurityConfiguration->>LdapUserAuthoritiesPopulator: Fetch granted authorities
+            LdapUserAuthoritiesPopulator->>AuthUserDetailsServiceImpl: Load user by username
+            alt User exist
+                AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: update granted authorities if any
+            else User not exist
+                AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: insert new user information into database
+                end
+            AuthUserDetailsServiceImpl->>WebSecurityConfiguration: Build AuthenticationManagerBuilder
             WebSecurityConfiguration->>AuthorizationController: Provide granted authorities
         else Validate failed
             WebSecurityConfiguration->>AuthorizationController: Exception thrown InvalidGrantException
