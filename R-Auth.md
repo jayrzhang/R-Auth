@@ -40,34 +40,30 @@ R-Auth provides below importatnt features:
     sequenceDiagram
     autonumber
     participant AuthorizationController
-    participant APIFilter
+    participant R_Integration
+    participant Database
+    participant VaultController
+    participant VaultServiceImpl
     participant LdapUserAuthoritiesPopulator
     participant AuthUserDetailsServiceImpl
     participant WebSecurityConfiguration
-    AuthorizationController->>APIFilter: Invoke http interceptor to check if user is superuser or normal user
-    alt Normaluser
-        APIFilter->>WebSecurityConfiguration: Access Ldap server and validate given username and password
-        alt Validate success
-            WebSecurityConfiguration->>LdapUserAuthoritiesPopulator: Fetch granted authorities
-            LdapUserAuthoritiesPopulator->>AuthUserDetailsServiceImpl: Load user by username
-            alt User exist
-                AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: update granted authorities if any
-            else User not exist
-                AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: insert new user information into database
-                end
-            AuthUserDetailsServiceImpl->>WebSecurityConfiguration: Build AuthenticationManagerBuilder
-            WebSecurityConfiguration->>AuthorizationController: Provide granted authorities
-        else Validate failed
-            WebSecurityConfiguration->>AuthorizationController: Exception thrown InvalidGrantException
+    VaultController->>VaultServiceImpl: Invoke initialize() at application start-up
+    VaultServiceImpl->>R_Integration: Send request to R-Integration Vault endpoint to fetch superuser username and password
+    VaultServiceImpl->>Database: Update db with superuser username and password
+    VaultServiceImpl->>WebSecurityConfiguration: Update InMemoryUserDetailsManager with superuser username and password
+    WebSecurityConfiguration->>WebSecurityConfiguration: Connect spring security with Ldap server and InMemoryUserDetailsManager to validate given username and password
+    alt Validate success
+        WebSecurityConfiguration->>LdapUserAuthoritiesPopulator: Fetch granted authorities
+        LdapUserAuthoritiesPopulator->>AuthUserDetailsServiceImpl: Load user by username
+        alt User exist
+            AuthUserDetailsServiceImpl->>AuthUserDetailsServiceImpl: Update granted authorities if any
+        else User not exist
+            AuthUserDetailsServiceImpl->>Database: Insert new user information into db
             end
-    else Superuser
-        APIFilter->>R-Integration Vault Endpoint: Validate given username and password
-        alt Validate success
-            WebSecurityConfiguration->>AuthorizationController: Provide granted authorities
-        else Validate failed
-            WebSecurityConfiguration->>AuthorizationController: Exception thrown InvalidGrantException
-            end
-    end
+        WebSecurityConfiguration->>AuthorizationController: Return granted authorities
+    else Validate failed
+        WebSecurityConfiguration->>AuthorizationController: Exception thrown InvalidGrantException
+        end
 ```
 
 ## Database
