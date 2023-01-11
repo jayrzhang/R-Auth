@@ -35,6 +35,21 @@ Principal --|> ResponseEntity
 ### Overview
 R-Auth provides below importatnt features:
 1. Authorization service
+
+### OAuth2 flow
+``` mermaid
+    sequenceDiagram
+    autonumber
+    participant Client
+    participant Authorization_Server
+    participant Resource_Server
+    Client->>Authorization_Server: Client requests access token(with parameters of clientId, clientSecret, username, password...)
+    Authorization_Server->>Client: Return an access token
+    Client->>Resource_Server: Issue API calls with access token to get the resource
+    Resource_Server->>Client: Return the requested resource
+```
+    
+    
 ### Authorize flow
 ``` mermaid
     sequenceDiagram
