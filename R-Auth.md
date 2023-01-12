@@ -51,7 +51,10 @@ and Vault.
     Client->>Resource_Server: Issue API calls with access token to get the resource
     Resource_Server->>Client: Return the requested resource
 ```
-    
+  Note 1: Authorization_Server is what R-Auth provides for authentication, Resource_Server is the protected services 
+  that we want to get access to. A resource server can be R-Data, R-Report and even R-Auth itself.
+  Note 2: When client requests access token, the clientId is the basic authentication to be matched with each resource 
+  server's resourceId. In our symcarrier solution, clientId can be symcarrier, roaming360 or rauth.
     
 ### Authorize flow
 ``` mermaid
