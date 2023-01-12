@@ -33,10 +33,13 @@ Principal --|> ResponseEntity
 # R-Auth Documents
 ## Features
 ### Overview
-R-Auth provides below importatnt features:
-1. Authorization service
+R-Auth is a microservice that handles login authorization and authentication for the resource servers 
+of R-Auth, R-Data, R-Report, Roaming360. Any other Java springboot microservices can be easily configured to 
+connect with R-Auth for authentication service. Its authorization server is connected with Ldap server 
+and Vault.
 
 ### OAuth2 flow
+
 ``` mermaid
     sequenceDiagram
     autonumber
