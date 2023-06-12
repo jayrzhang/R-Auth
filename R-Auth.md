@@ -96,14 +96,18 @@ and Vault.
     participant R-Report
     participant Keycloak
     participant API-GW
-    participant UM-getPermission
+    participant UM
     R-Portal->>Keycloak: Client redirected to Keycloak login page for authentication
+    Keycloak->>UM: Store session with scopes
+    UM->>Keycloak: Session stored
     Keycloak->>R-Portal: Return an access token and redirect client to R-Portal default dashboard page when authentication succeeds
-    R-Portal->>UM-getPermission: Send request to UM getPermission endpoint for UI permissions
-    UM-getPermission->>R-Portal: Return list of UI permissions
+    R-Portal->>UM: Send request to UM getPermission endpoint for UI permissions
+    UM->>R-Portal: Return list of UI permissions
     R-Portal->>API-GW: Issue API calls with access token to API-GW to get the resource
-    API-GW->>Keycloak: Validate user in Keycloak for access token if API permissions are matched
+    API-GW->>Keycloak: Validate user in Keycloak for access token
     Keycloak->>API-GW: Return true if validation succeeds
+    API-GW->>UM: Validate session and scopes for access token and validate API permissions based on session id
+    UM->>API-GW: Session and API permissions validated
     API-GW->>R-Data: Send request for requested resource
     R-Data->>API-GW: Return the requested resource
     API-GW->>R-Report: Send request for requested resource
