@@ -87,6 +87,31 @@ and Vault.
         end
 ```
 
+### Keycloak flow
+``` mermaid
+    sequenceDiagram
+    autonumber
+    participant R-Portal
+    participant R-Data
+    participant R-Report
+    participant Keycloak
+    participant API-GW
+    participant UM-getPermission
+    R-Portal->>Keycloak: Client redirected to Keycloak login page for authentication
+    Keycloak->>R-Portal: Return an access token and redirect client to R-Portal default dashboard page when authentication succeeds
+    R-Portal->>UM-getPermission: Send request to UM getPermission endpoint for UI permissions
+    UM-getPermission->>R-Portal: Return list of UI permissions
+    R-Portal->>API-GW: Issue API calls with access token to API-GW to get the resource
+    API-GW->>Keycloak: Validate user in Keycloak for access token if API permissions are matched
+    Keycloak->>API-GW: Return true if validation succeeds
+    API-GW->>R-Data: Send request for requested resource
+    R-Data->>API-GW: Return the requested resource
+    API-GW->>R-Report: Send request for requested resource
+    R-Report->>API-GW: Return the requested resource
+    API-GW->>R-Portal: Return the requested resource
+```
+
+
 ## Database
 ### Roles
 ```go
