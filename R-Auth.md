@@ -96,19 +96,16 @@ and Vault.
     participant R-Report
     participant Keycloak
     participant API-GW
-    participant Keycloak-Redis
-    participant UM-Redis
+    participant Redis
     R-Portal->>Keycloak: Client redirected to Keycloak login page for authentication
-    Keycloak->>Keycloak-Redis: Store session with scopes
-    Keycloak-Redis->>Keycloak: Session stored
+    Keycloak->>Redis: Store session with scopes
+    Redis->>Keycloak: Session stored
     Keycloak->>R-Portal: Return an access token and redirect client to R-Portal default dashboard page when authentication succeeds
-    R-Portal->>Keycloak-Redis: Validate session and scopes for roles
-    Keycloak-Redis->>R-Portal: Return list of roles
     R-Portal->>API-GW: Issue API calls with access token to API-GW to get the resource
     API-GW->>Keycloak: Validate user in Keycloak for access token
     Keycloak->>API-GW: Return true if validation succeeds
-    API-GW->>UM: Validate session and scopes for access token and validate API permissions based on session id
-    UM->>API-GW: Session and API permissions validated
+    API-GW->>Redis: Validate session and scopes for access token and validate API permissions based on session id
+    Redis->>API-GW: Session and API permissions validated
     API-GW->>R-Data: Send request for requested resource
     R-Data->>API-GW: Return the requested resource
     API-GW->>R-Report: Send request for requested resource
